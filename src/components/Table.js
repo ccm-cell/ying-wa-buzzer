@@ -282,7 +282,7 @@ export default function Table(game) {
                     ? 'Buzzed'
                     : 'Buzz'}
                 </span>
-                {confirmed ? <span className="buzz-confirm">搶到</span> : null}
+                {confirmed ? <span className="buzz-confirm">求之不得</span> : null}
               </button>
             )}
           </div>

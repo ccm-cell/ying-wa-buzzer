@@ -1,4 +1,4 @@
-const TEAM_LETTERS = ['A', 'B', 'C', 'D', 'E'];
+export const TEAM_LETTERS = ['A', 'B', 'C', 'D', 'E'];
 
 function normalizeName(name) {
   return String(name)

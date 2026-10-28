@@ -4,7 +4,15 @@ import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
 import { Container } from 'react-bootstrap';
 import Header from '../components/Header';
-import { teamImageForName } from '../lib/teams';
+import HostBoard from '../components/HostBoard';
+import { teamFromName, teamImageForName } from '../lib/teams';
+
+function nameClass(name, connected) {
+  const team = teamFromName(name);
+  return ['name', team ? `team-${team}` : '', connected ? '' : 'dim']
+    .filter(Boolean)
+    .join(' ');
+}
 
 export default function Table(game) {
   const [loaded, setLoaded] = useState(false);
@@ -152,6 +160,7 @@ export default function Table(game) {
           {!game.isConnected ? (
             <p className="warning">Disconnected - attempting to reconnect...</p>
           ) : null}
+          {isHost ? <HostBoard roomId={game.gameID} /> : null}
           <div id="buzzer">
             {winnerImage ? (
               <img
@@ -208,7 +217,7 @@ export default function Table(game) {
                     }
                   }}
                 >
-                  <div className={`name ${!connected ? 'dim' : ''}`}>
+                  <div className={nameClass(name, connected)}>
                     {name}
                     {!connected ? (
                       <AiOutlineDisconnect className="disconnected" />
@@ -231,7 +240,7 @@ export default function Table(game) {
           <ul>
             {activePlayers.map(({ id, name, connected }) => (
               <li key={id}>
-                <div className={`name ${!connected ? 'dim' : ''}`}>
+                <div className={nameClass(name, connected)}>
                   {name}
                   {!connected ? (
                     <AiOutlineDisconnect className="disconnected" />

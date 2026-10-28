@@ -19,42 +19,31 @@
 html,
 body {
   min-height: 100%;
-  background-color: #172044;
-  background-image:
-    radial-gradient(ellipse 72% 58% at 50% 36%, rgba(98, 168, 255, 0.34), transparent 62%),
-    radial-gradient(ellipse 42% 32% at 82% 92%, rgba(255, 196, 92, 0.14), transparent 70%),
-    linear-gradient(165deg, #2a3878 0%, #1b2758 48%, #12182f 100%);
-  background-attachment: fixed;
+  background: transparent;
 }
 
 .App {
-  color: white;
+  color: #243056;
   font-family: 'Inter', sans-serif;
 }
 
-.bg-people {
+.page-bg {
   position: fixed;
   inset: 0;
-  pointer-events: none;
   z-index: 0;
+  pointer-events: none;
+  background: #f3e2c4 url('./assets/ywps-quiz-background.jpg') center / cover no-repeat;
 }
 
-.bg-people img {
-  position: absolute;
-  bottom: 0;
-  height: min(62vh, 540px);
-  width: auto;
-  max-width: 36vw;
-  object-fit: contain;
-  filter: drop-shadow(0 14px 18px rgba(8, 18, 48, 0.28));
-}
-
-.bg-people .left {
-  left: 1vw;
-}
-
-.bg-people .right {
-  right: 1vw;
+.school-crest {
+  position: fixed;
+  top: 8px;
+  right: 12px;
+  z-index: 5;
+  width: 104px;
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 10px rgba(70, 24, 24, 0.28));
 }
 
 .app-foreground {
@@ -64,10 +53,10 @@ body {
 }
 
 @media screen and (max-width: 767px) {
-  .bg-people img {
-    height: 30vh;
-    max-width: 42vw;
-    opacity: 0.72;
+  .school-crest {
+    width: 68px;
+    top: 6px;
+    right: 6px;
   }
 }
 
@@ -93,20 +82,22 @@ body {
 }
 
 .App header .navbar-brand {
-  color: white;
-  font-weight: 600;
-  font-size: 1.2rem;
+  color: #8e1b2c;
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
 .App header .navbar-brand:hover {
-  color: white;
+  color: #8e1b2c;
 }
 
 .App header nav {
   justify-content: space-between;
+  padding-right: 118px;
 }
 
 .App header svg {
@@ -120,12 +111,12 @@ body {
 /* BUTTON */
 
 .App button {
-  background: none;
+  background: rgba(255, 250, 242, 0.88);
   font-weight: 700;
-  color: white;
+  color: #3d2a14;
   padding: 8px 10px;
   border-radius: 4px;
-  border: solid 1px white;
+  border: solid 1px #8e1b2c;
 }
 
 .App button:disabled {
@@ -134,7 +125,7 @@ body {
 }
 
 .App button:hover:enabled {
-  background-color: var(--lightBackgroundColor);
+  background-color: rgba(142, 27, 44, 0.1);
 }
 
 .App button:focus:enabled {
@@ -143,31 +134,32 @@ body {
 
 .App button.text-button {
   font-weight: 500;
-  color: var(--dimTextColor);
+  color: #5c4630;
   border: none;
+  background: none;
 }
 
 .App button.text-button:hover {
-  color: white;
+  color: #8e1b2c;
 }
 
 /* FOOTER */
 .App footer {
-  background-color: var(--backgroundColor);
+  background-color: transparent;
   padding: 30px 0;
-  color: var(--paragraphColor);
+  color: #4a3b2a;
   text-align: center;
   margin-top: 40px;
 }
 
 .App #footer-simple {
   padding: 30px 0;
-  color: var(--paragraphColor);
+  color: #4a3b2a;
 }
 
 .App footer a,
 .App #footer-simple a {
-  color: var(--lightBlueColor);
+  color: #8e1b2c;
 }
 
 .App footer a:hover,
@@ -181,7 +173,7 @@ body {
 .App #lobby-left {
   flex-grow: 40;
   flex-basis: 320px;
-  background-color: rgba(16, 26, 62, 0.42);
+  background-color: rgba(255, 250, 242, 0.78);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -240,7 +232,7 @@ body {
 }
 
 .App .touts p {
-  color: var(--paragraphColor);
+  color: #4a4034;
   line-height: 140%;
   font-size: 1rem;
 }
@@ -265,6 +257,7 @@ body {
 .App .lobby-form button[type='submit'] {
   width: 100%;
   background-color: var(--brightBlueColor);
+  color: white;
   border: none;
   margin-top: 1rem;
   padding: 12px 15px;
@@ -284,7 +277,7 @@ body {
   padding: 0;
   font-weight: 500;
   display: inline-block;
-  color: var(--lightBlueColor);
+  color: #8e1b2c;
   width: auto;
 }
 
@@ -307,6 +300,11 @@ body {
 .App #game .container {
   text-align: center;
   margin-top: 20px;
+  background: rgba(255, 250, 242, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 28px;
+  padding: 24px 18px 32px;
+  box-shadow: 0 16px 36px rgba(70, 40, 10, 0.12);
 }
 
 .App #room-title {
@@ -459,7 +457,27 @@ body {
 }
 
 .App .queue li.resettable .player-sign:hover {
-  background-color: var(--lightBackgroundColor);
+  background-color: rgba(226, 195, 106, 0.35);
+}
+
+.App .queue li .name.team-A {
+  color: #c0392b;
+}
+
+.App .queue li .name.team-B {
+  color: #a56f00;
+}
+
+.App .queue li .name.team-C {
+  color: #1e8c4a;
+}
+
+.App .queue li .name.team-D {
+  color: #1f5fbf;
+}
+
+.App .queue li .name.team-E {
+  color: #7b3fa3;
 }
 
 .App .queue .disconnected {
@@ -482,4 +500,175 @@ body {
 
 .App .dim {
   opacity: 0.5;
+}
+
+.host-board {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: stretch;
+  max-width: 960px;
+  margin: 8px auto 4px;
+}
+
+.timer-card,
+.scoreboard {
+  border: 4px solid #e2c36a;
+  border-radius: 16px;
+  box-shadow: 0 10px 22px rgba(70, 36, 12, 0.16);
+}
+
+.timer-card {
+  width: 220px;
+  padding: 12px 12px 14px;
+  background: rgba(255, 250, 242, 0.94);
+}
+
+.timer-card h2,
+.scoreboard h2 {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  color: #8e1b2c;
+}
+
+.scoreboard h2 {
+  color: #f8e7b0;
+}
+
+.clock-face {
+  width: 132px;
+  height: 132px;
+  margin: 10px auto 8px;
+  border-radius: 50%;
+  border: 7px solid #7a1c2a;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 50%, #fffaf2 0 52%, transparent 53%),
+    conic-gradient(from -90deg, #c9a24a var(--remain), #efe4cf 0);
+  box-shadow: inset 0 0 0 4px #f6e7c4;
+}
+
+.clock-face.done {
+  background:
+    radial-gradient(circle at 50% 50%, #fff6f4 0 52%, transparent 53%),
+    conic-gradient(#c0392b 0 100%);
+}
+
+.clock-face strong {
+  font-size: 2rem;
+  color: #243056;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-actions {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.App .timer-card button {
+  padding: 4px 8px;
+  font-size: 0.85rem;
+}
+
+.App .timer-card button.selected {
+  background: #8e1b2c;
+  color: #fffaf2;
+}
+
+.scoreboard {
+  flex: 1 1 480px;
+  padding: 12px 14px 14px;
+  background: linear-gradient(180deg, #1d4a34 0%, #143628 100%);
+}
+
+.scoreboard ul {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+}
+
+.scoreboard .lane {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px 6px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 6px solid var(--lane);
+}
+
+.lane-A {
+  --lane: #e15b4c;
+}
+
+.lane-B {
+  --lane: #e2b43a;
+}
+
+.lane-C {
+  --lane: #3cbe72;
+}
+
+.lane-D {
+  --lane: #4d86e8;
+}
+
+.lane-E {
+  --lane: #b07adf;
+}
+
+.lane-name,
+.lane-score {
+  display: block;
+  color: #f8f1dc;
+}
+
+.lane-name {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+
+.lane-score {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.lane-actions {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.App .scoreboard button {
+  color: #f8f1dc;
+  border-color: #e2c36a;
+  background: transparent;
+  padding: 0 8px;
+  line-height: 1.4;
+}
+
+.App .scoreboard button:hover:enabled {
+  background: rgba(226, 195, 106, 0.2);
+}
+
+@media screen and (max-width: 767px) {
+  .App header nav {
+    padding-right: 74px;
+  }
+
+  .scoreboard ul {
+    flex-wrap: wrap;
+  }
+
+  .scoreboard .lane {
+    flex: 1 1 30%;
+  }
 }

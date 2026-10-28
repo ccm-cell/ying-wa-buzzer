@@ -9,8 +9,7 @@ import { get, isNil } from 'lodash';
 
 import Lobby from './containers/Lobby';
 import Game from './containers/Game';
-import personExplorer from './assets/person-explorer.png';
-import personStudent from './assets/person-student.png';
+import crest from './assets/ywps-crest.png';
 import './App.css';
 
 function App() {
@@ -24,10 +23,8 @@ function App() {
 
   return (
     <div className="App">
-      <div className="bg-people" aria-hidden="true">
-        <img className="left" src={personExplorer} alt="" />
-        <img className="right" src={personStudent} alt="" />
-      </div>
+      <div className="page-bg" aria-hidden="true" />
+      <img className="school-crest" src={crest} alt="英華小學校徽" />
       <div className="app-foreground">
         <Router basename={routerBasename}>
           <Switch>

@@ -4,7 +4,7 @@ import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
 import { Container } from 'react-bootstrap';
 import Header from '../components/Header';
-import HostBoard from '../components/HostBoard';
+import crest from '../assets/ywps-crest.png';
 import { teamFromName, teamImageForName } from '../lib/teams';
 
 function nameClass(name, connected) {
@@ -19,11 +19,16 @@ export default function Table(game) {
   const [buzzed, setBuzzer] = useState(
     some(game.G.queue, (o) => o.id === game.playerID)
   );
-  const [lastBuzz, setLastBuzz] = useState(null);
   const [sound, setSound] = useState(false);
   const [soundPlayed, setSoundPlayed] = useState(false);
+  const [sealed, setSealed] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
   const buzzButton = useRef(null);
-  const queueRef = useRef(null);
+  const queueSeen = useRef(false);
+  const queueWasEmpty = useRef(true);
+  const lockedRef = useRef(game.G.locked);
+  const winnerSeen = useRef(false);
+  const lastWinner = useRef(null);
 
   const buzzSound = new Howl({
     src: [
@@ -42,25 +47,34 @@ export default function Table(game) {
   };
 
   useEffect(() => {
-    console.log(game.G.queue, Date.now());
-    // reset buzzer based on game
+    const empty = isEmpty(game.G.queue);
     if (!game.G.queue[game.playerID]) {
-      // delay the reset, in case game state hasn't reflected your buzz yet
-      if (lastBuzz && Date.now() - lastBuzz < 500) {
-        setTimeout(() => {
-          const queue = queueRef.current;
-          if (queue && !queue[game.playerID]) {
-            setBuzzer(false);
-          }
-        }, 500);
-      } else {
-        // immediate reset, if it's been awhile
-        setBuzzer(false);
-      }
+      setBuzzer(false);
     }
 
-    // reset ability to play sound if there is no pending buzzer
-    if (isEmpty(game.G.queue)) {
+    if (!queueSeen.current) {
+      queueSeen.current = true;
+      queueWasEmpty.current = empty;
+    } else if (!queueWasEmpty.current && empty) {
+      queueWasEmpty.current = true;
+      setSealed(true);
+    } else {
+      queueWasEmpty.current = empty;
+    }
+
+    const first = sortBy(values(game.G.queue), ['timestamp'])[0];
+    const firstId = first ? first.id : null;
+    if (!winnerSeen.current) {
+      winnerSeen.current = true;
+      lastWinner.current = firstId;
+    } else if (firstId && firstId !== lastWinner.current) {
+      lastWinner.current = firstId;
+      setCelebrate(true);
+    } else if (!firstId) {
+      lastWinner.current = null;
+    }
+
+    if (empty) {
       setSoundPlayed(false);
     } else if (loaded) {
       playSound();
@@ -69,19 +83,53 @@ export default function Table(game) {
     if (!loaded) {
       setLoaded(true);
     }
-
-    queueRef.current = game.G.queue;
     // Queue changes are the only trigger; the other values are read inside.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.G.queue]);
 
+  useEffect(() => {
+    if (!celebrate) {
+      return undefined;
+    }
+    const timer = setTimeout(() => setCelebrate(false), 1700);
+    return () => clearTimeout(timer);
+  }, [celebrate]);
+
+  useEffect(() => {
+    if (lockedRef.current && !game.G.locked) {
+      setSealed(false);
+    }
+    lockedRef.current = game.G.locked;
+  }, [game.G.locked]);
+
+  const held = buzzed || game.G.locked || sealed;
+
   const attemptBuzz = () => {
-    if (!buzzed) {
+    if (!held) {
       playSound();
       game.moves.buzz(game.playerID);
       setBuzzer(true);
-      setLastBuzz(Date.now());
     }
+  };
+
+  const resetAll = () => {
+    setSealed(true);
+    game.moves.resetBuzzers();
+    if (!game.G.locked) {
+      game.moves.toggleLock();
+    }
+  };
+
+  const onCrest = () => {
+    if (sealed && !game.G.locked) {
+      return;
+    }
+    if (game.G.locked) {
+      setSealed(false);
+      game.moves.toggleLock();
+      return;
+    }
+    game.moves.toggleLock();
   };
 
   // spacebar will buzz
@@ -140,8 +188,25 @@ export default function Table(game) {
   const winner = buzzedPlayers[0];
   const winnerImage = isHost && winner ? teamImageForName(winner.name) : null;
 
+  const sparks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+
   return (
     <div>
+      {celebrate ? (
+        <div className="celebrate" aria-hidden="true">
+          <div className="gold-flash" />
+          {sparks.map((spark) => (
+            <span
+              key={spark}
+              className="spark"
+              style={{
+                '--a': `${spark * 26}deg`,
+                '--d': `${(spark % 5) * 0.05}s`,
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
       <Header
         auth={game.headerData}
         clearAuth={() =>
@@ -160,7 +225,6 @@ export default function Table(game) {
           {!game.isConnected ? (
             <p className="warning">Disconnected - attempting to reconnect...</p>
           ) : null}
-          {isHost ? <HostBoard roomId={game.gameID} /> : null}
           <div id="buzzer">
             {winnerImage ? (
               <img
@@ -171,52 +235,85 @@ export default function Table(game) {
             ) : (
               <button
                 ref={buzzButton}
-                disabled={buzzed || game.G.locked}
+                disabled={held}
                 onClick={() => {
-                  if (!buzzed && !game.G.locked) {
+                  if (!held) {
                     attemptBuzz();
                   }
                 }}
               >
-                {game.G.locked ? 'Locked' : buzzed ? 'Buzzed' : 'Buzz'}
+                {game.G.locked || sealed
+                  ? 'Locked'
+                  : buzzed
+                  ? 'Buzzed'
+                  : 'Buzz'}
               </button>
             )}
           </div>
           {isHost ? (
             <div className="settings">
+              <button
+                type="button"
+                className={`crest-unlock${
+                  game.G.locked || sealed ? ' is-locked' : ''
+                }`}
+                onClick={onCrest}
+                aria-label={
+                  game.G.locked || sealed ? 'Unlock buzzers' : 'Lock buzzers'
+                }
+              >
+                <img src={crest} alt="" />
+                <span>{game.G.locked || sealed ? '解開' : '鎖上'}</span>
+              </button>
               <div className="button-container">
                 <button
-                  className="text-button"
-                  onClick={() => game.moves.toggleLock()}
-                >
-                  {game.G.locked ? 'Unlock buzzers' : 'Lock buzzers'}
-                </button>
-              </div>
-              <div className="button-container">
-                <button
+                  type="button"
                   disabled={isEmpty(game.G.queue)}
-                  onClick={() => game.moves.resetBuzzers()}
+                  onClick={resetAll}
                 >
                   Reset all buzzers
                 </button>
               </div>
-              <div className="divider" />
             </div>
           ) : null}
         </section>
-        <div className="queue">
-          <p>Players Buzzed</p>
-          <ul>
-            {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
-              <li key={id} className={isHost ? 'resettable' : null}>
-                <div
-                  className="player-sign"
-                  onClick={() => {
-                    if (isHost) {
-                      game.moves.resetBuzzer(id);
-                    }
-                  }}
-                >
+        <div className="player-board">
+          <div className="queue">
+            <p>Players Buzzed</p>
+            <ul>
+              {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
+                <li key={id} className={isHost ? 'resettable' : null}>
+                  <div
+                    className="player-sign"
+                    onClick={() => {
+                      if (isHost) {
+                        game.moves.resetBuzzer(id);
+                      }
+                    }}
+                  >
+                    <div className={nameClass(name, connected)}>
+                      {name}
+                      {!connected ? (
+                        <AiOutlineDisconnect className="disconnected" />
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                    {i > 0 ? (
+                      <div className="mini">
+                        {timeDisplay(timestamp - queue[0].timestamp)}
+                      </div>
+                    ) : null}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="queue">
+            <p>Other Players</p>
+            <ul>
+              {activePlayers.map(({ id, name, connected }) => (
+                <li key={id}>
                   <div className={nameClass(name, connected)}>
                     {name}
                     {!connected ? (
@@ -225,32 +322,10 @@ export default function Table(game) {
                       ''
                     )}
                   </div>
-                  {i > 0 ? (
-                    <div className="mini">
-                      {timeDisplay(timestamp - queue[0].timestamp)}
-                    </div>
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="queue">
-          <p>Other Players</p>
-          <ul>
-            {activePlayers.map(({ id, name, connected }) => (
-              <li key={id}>
-                <div className={nameClass(name, connected)}>
-                  {name}
-                  {!connected ? (
-                    <AiOutlineDisconnect className="disconnected" />
-                  ) : (
-                    ''
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </Container>
     </div>

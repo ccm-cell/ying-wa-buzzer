@@ -1,6 +1,6 @@
 {
-    "name": "Multibuzzer",
-    "short_name": "Multibuzzer",
+    "name": "YWPS 搶答",
+    "short_name": "YWPS 搶答",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -13,7 +13,7 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#282c35",
-    "background_color": "#282c35",
+    "theme_color": "#172044",
+    "background_color": "#172044",
     "display": "standalone"
 }

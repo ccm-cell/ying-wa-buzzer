@@ -46,7 +46,7 @@ export default function Header({
     <header>
       <Navbar>
         <Navbar.Brand>
-          <Logo /> Multibuzzer
+          <Logo /> YWPS 搶答
         </Navbar.Brand>
         <div className="nav-buttons">
           {!isNil(sound) ? (

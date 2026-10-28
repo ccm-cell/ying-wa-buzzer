@@ -9,6 +9,8 @@ import { get, isNil } from 'lodash';
 
 import Lobby from './containers/Lobby';
 import Game from './containers/Game';
+import personExplorer from './assets/person-explorer.png';
+import personStudent from './assets/person-student.png';
 import './App.css';
 
 function App() {
@@ -22,33 +24,39 @@ function App() {
 
   return (
     <div className="App">
-      <Router basename={routerBasename}>
-        <Switch>
-          <Route
-            path="/:id"
-            render={({ location, match }) => {
-              const roomID = get(match, 'params.id');
-              // redirect if the roomID in auth doesn't match, or no credentials
-              return roomID &&
-                auth.roomID === roomID &&
-                !isNil(auth.credentials) &&
-                !isNil(auth.playerID) ? (
-                <Game auth={auth} setAuth={setAuth} />
-              ) : (
-                <Redirect
-                  to={{
-                    pathname: '/',
-                    state: { from: location, roomID },
-                  }}
-                />
-              );
-            }}
-          />
-          <Route path="/">
-            <Lobby setAuth={setAuth} />
-          </Route>
-        </Switch>
-      </Router>
+      <div className="bg-people" aria-hidden="true">
+        <img className="left" src={personExplorer} alt="" />
+        <img className="right" src={personStudent} alt="" />
+      </div>
+      <div className="app-foreground">
+        <Router basename={routerBasename}>
+          <Switch>
+            <Route
+              path="/:id"
+              render={({ location, match }) => {
+                const roomID = get(match, 'params.id');
+                // redirect if the roomID in auth doesn't match, or no credentials
+                return roomID &&
+                  auth.roomID === roomID &&
+                  !isNil(auth.credentials) &&
+                  !isNil(auth.playerID) ? (
+                  <Game auth={auth} setAuth={setAuth} />
+                ) : (
+                  <Redirect
+                    to={{
+                      pathname: '/',
+                      state: { from: location, roomID },
+                    }}
+                  />
+                );
+              }}
+            />
+            <Route path="/">
+              <Lobby setAuth={setAuth} />
+            </Route>
+          </Switch>
+        </Router>
+      </div>
     </div>
   );
 }

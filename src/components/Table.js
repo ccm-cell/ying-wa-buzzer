@@ -63,6 +63,8 @@ export default function Table(game) {
     }
 
     queueRef.current = game.G.queue;
+    // Queue changes are the only trigger; the other values are read inside.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.G.queue]);
 
   const attemptBuzz = () => {

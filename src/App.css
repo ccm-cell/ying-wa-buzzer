@@ -169,6 +169,15 @@ body {
   color: #4a3b2a;
 }
 
+.creator-credit {
+  margin: 0 0 6px;
+  text-align: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  color: rgba(74, 59, 42, 0.7);
+  font-weight: 500;
+}
+
 .App footer a,
 .App #footer-simple a {
   color: #8e1b2c;

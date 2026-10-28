@@ -4,6 +4,7 @@ import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
 import { Container } from 'react-bootstrap';
 import Header from '../components/Header';
+import { CreatorCredit } from './Footer';
 import birdButton from '../assets/bird-buzzer-button.jpg';
 import { teamFromName, teamImageForName } from '../lib/teams';
 
@@ -282,7 +283,9 @@ export default function Table(game) {
                     ? 'Buzzed'
                     : 'Buzz'}
                 </span>
-                {confirmed ? <span className="buzz-confirm">求之不得</span> : null}
+                {confirmed ? (
+                  <span className="buzz-confirm">求之不得</span>
+                ) : null}
               </button>
             )}
           </div>
@@ -338,6 +341,7 @@ export default function Table(game) {
           </div>
         </div>
       </Container>
+      <CreatorCredit />
     </div>
   );
 }

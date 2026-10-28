@@ -1,9 +1,14 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
 
+export function CreatorCredit() {
+  return <p className="creator-credit">創作者：CCM</p>;
+}
+
 export function FooterSimple() {
   return (
     <div id="footer-simple">
+      <CreatorCredit />
       Built on{' '}
       <a
         target="_blank"
@@ -25,6 +30,7 @@ export default function Footer({ mobileOnly = false }) {
     <footer className={mobileOnly ? 'd-block d-md-none' : null}>
       <Container>
         <div>
+          <CreatorCredit />
           Built on{' '}
           <a
             target="_blank"

@@ -33,19 +33,6 @@ body {
   z-index: 0;
   pointer-events: none;
   background: #f3e2c4 url('./assets/ywps-quiz-background.jpg') center / cover no-repeat;
-  animation: corridor-flicker 2.8s ease-in-out infinite;
-}
-
-.page-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at 50% 16%, rgba(255, 236, 186, 0.55), transparent 36%),
-    radial-gradient(ellipse at 18% 42%, rgba(255, 244, 214, 0.28), transparent 22%),
-    radial-gradient(ellipse at 82% 40%, rgba(255, 244, 214, 0.28), transparent 22%);
-  animation: light-flicker 2.2s ease-in-out infinite;
 }
 
 .school-crest {
@@ -733,50 +720,6 @@ body {
   }
 }
 
-@keyframes corridor-flicker {
-  0%,
-  100% {
-    filter: brightness(0.82);
-  }
-  16% {
-    filter: brightness(1.45);
-  }
-  28% {
-    filter: brightness(0.62);
-  }
-  46% {
-    filter: brightness(1.35);
-  }
-  63% {
-    filter: brightness(0.7);
-  }
-  80% {
-    filter: brightness(1.28);
-  }
-}
-
-@keyframes light-flicker {
-  0%,
-  100% {
-    opacity: 0.15;
-  }
-  18% {
-    opacity: 1;
-  }
-  32% {
-    opacity: 0.05;
-  }
-  50% {
-    opacity: 0.92;
-  }
-  68% {
-    opacity: 0.08;
-  }
-  84% {
-    opacity: 0.8;
-  }
-}
-
 @keyframes buzz-pulse {
   0%,
   100% {
@@ -893,8 +836,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-bg,
-  .page-bg::after,
   .crest-pop,
   .App #lobby,
   .App #game,

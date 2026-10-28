@@ -4,7 +4,7 @@ import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
 import { Container } from 'react-bootstrap';
 import Header from '../components/Header';
-import crest from '../assets/ywps-crest.png';
+import birdButton from '../assets/bird-buzzer-button.jpg';
 import { teamFromName, teamImageForName } from '../lib/teams';
 
 function nameClass(name, connected) {
@@ -23,12 +23,14 @@ export default function Table(game) {
   const [soundPlayed, setSoundPlayed] = useState(false);
   const [sealed, setSealed] = useState(false);
   const [celebrate, setCelebrate] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const buzzButton = useRef(null);
   const queueSeen = useRef(false);
   const queueWasEmpty = useRef(true);
   const lockedRef = useRef(game.G.locked);
   const winnerSeen = useRef(false);
   const lastWinner = useRef(null);
+  const wasBuzzed = useRef(buzzed);
 
   const buzzSound = new Howl({
     src: [
@@ -91,7 +93,7 @@ export default function Table(game) {
     if (!celebrate) {
       return undefined;
     }
-    const timer = setTimeout(() => setCelebrate(false), 1700);
+    const timer = setTimeout(() => setCelebrate(false), 3200);
     return () => clearTimeout(timer);
   }, [celebrate]);
 
@@ -101,6 +103,20 @@ export default function Table(game) {
     }
     lockedRef.current = game.G.locked;
   }, [game.G.locked]);
+
+  useEffect(() => {
+    if (!wasBuzzed.current && buzzed) {
+      setConfirmed(true);
+      const timer = setTimeout(() => setConfirmed(false), 1400);
+      wasBuzzed.current = true;
+      return () => clearTimeout(timer);
+    }
+    wasBuzzed.current = buzzed;
+    if (!buzzed) {
+      setConfirmed(false);
+    }
+    return undefined;
+  }, [buzzed]);
 
   const held = buzzed || game.G.locked || sealed;
 
@@ -188,7 +204,7 @@ export default function Table(game) {
   const winner = buzzedPlayers[0];
   const winnerImage = isHost && winner ? teamImageForName(winner.name) : null;
 
-  const sparks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+  const sparks = Array.from({ length: 32 }, (_, index) => index);
 
   return (
     <div>
@@ -200,8 +216,9 @@ export default function Table(game) {
               key={spark}
               className="spark"
               style={{
-                '--a': `${spark * 26}deg`,
-                '--d': `${(spark % 5) * 0.05}s`,
+                '--a': `${spark * 11.25}deg`,
+                '--d': `${(spark % 8) * 0.07}s`,
+                '--dist': `${260 + (spark % 4) * 110}px`,
               }}
             />
           ))}
@@ -219,7 +236,21 @@ export default function Table(game) {
         sound={sound}
         setSound={() => setSound(!sound)}
       />
-      <Container>
+      {isHost ? (
+        <div className="host-toolbar">
+          <button type="button" onClick={onCrest}>
+            {game.G.locked || sealed ? '解開' : '鎖上'}
+          </button>
+          <button
+            type="button"
+            disabled={isEmpty(game.G.queue)}
+            onClick={resetAll}
+          >
+            Reset all buzzers
+          </button>
+        </div>
+      ) : null}
+      <Container className={isHost ? 'with-toolbar' : ''}>
         <section>
           <p id="room-title">Room {game.gameID}</p>
           {!game.isConnected ? (
@@ -235,6 +266,7 @@ export default function Table(game) {
             ) : (
               <button
                 ref={buzzButton}
+                className={confirmed ? 'buzz-confirmed' : ''}
                 disabled={held}
                 onClick={() => {
                   if (!held) {
@@ -242,40 +274,18 @@ export default function Table(game) {
                   }
                 }}
               >
-                {game.G.locked || sealed
-                  ? 'Locked'
-                  : buzzed
-                  ? 'Buzzed'
-                  : 'Buzz'}
+                <img className="bird-face" src={birdButton} alt="" />
+                <span className="buzz-label">
+                  {game.G.locked || sealed
+                    ? 'Locked'
+                    : buzzed
+                    ? 'Buzzed'
+                    : 'Buzz'}
+                </span>
+                {confirmed ? <span className="buzz-confirm">搶到</span> : null}
               </button>
             )}
           </div>
-          {isHost ? (
-            <div className="settings">
-              <button
-                type="button"
-                className={`crest-unlock${
-                  game.G.locked || sealed ? ' is-locked' : ''
-                }`}
-                onClick={onCrest}
-                aria-label={
-                  game.G.locked || sealed ? 'Unlock buzzers' : 'Lock buzzers'
-                }
-              >
-                <img src={crest} alt="" />
-                <span>{game.G.locked || sealed ? '解開' : '鎖上'}</span>
-              </button>
-              <div className="button-container">
-                <button
-                  type="button"
-                  disabled={isEmpty(game.G.queue)}
-                  onClick={resetAll}
-                >
-                  Reset all buzzers
-                </button>
-              </div>
-            </div>
-          ) : null}
         </section>
         <div className="player-board">
           <div className="queue">

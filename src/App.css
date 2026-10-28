@@ -33,7 +33,7 @@ body {
   z-index: 0;
   pointer-events: none;
   background: #f3e2c4 url('./assets/ywps-quiz-background.jpg') center / cover no-repeat;
-  animation: corridor-flicker 6.5s ease-in-out infinite;
+  animation: corridor-flicker 2.8s ease-in-out infinite;
 }
 
 .page-bg::after {
@@ -45,14 +45,14 @@ body {
     radial-gradient(ellipse at 50% 16%, rgba(255, 236, 186, 0.55), transparent 36%),
     radial-gradient(ellipse at 18% 42%, rgba(255, 244, 214, 0.28), transparent 22%),
     radial-gradient(ellipse at 82% 40%, rgba(255, 244, 214, 0.28), transparent 22%);
-  animation: light-flicker 4.8s ease-in-out infinite;
+  animation: light-flicker 2.2s ease-in-out infinite;
 }
 
 .school-crest {
   position: fixed;
   top: 8px;
   right: 12px;
-  z-index: 5;
+  z-index: 8;
   width: 104px;
   height: auto;
   pointer-events: none;
@@ -61,7 +61,7 @@ body {
 }
 
 .crest-pop {
-  animation: crest-pop 0.85s cubic-bezier(0.18, 1.35, 0.38, 1) both;
+  animation: crest-pop 1.25s cubic-bezier(0.15, 1.7, 0.25, 1) both;
 }
 
 .app-foreground {
@@ -93,6 +93,13 @@ body {
 
 .App .primary {
   flex: 1;
+}
+
+.App header {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: rgba(255, 248, 236, 0.9);
 }
 
 .App header nav {
@@ -347,23 +354,55 @@ body {
 
 .App #buzzer > button {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: 320px;
+  height: 320px;
+  padding: 0;
+  border: none;
   border-radius: 50%;
-  border: 10px solid rgba(255, 255, 255, 0.28);
-  background: radial-gradient(circle at 34% 30%, #9cccff 0%, #3b8ef5 46%, #1d5ccc 100%);
-  box-shadow:
-    0 16px 36px rgba(18, 48, 120, 0.45),
-    inset 0 -14px 22px rgba(10, 36, 96, 0.28),
-    inset 0 10px 16px rgba(255, 255, 255, 0.38);
+  background: transparent;
+  box-shadow: 0 18px 36px rgba(70, 40, 10, 0.28);
   color: white;
   font-weight: 800;
-  font-size: 2.15rem;
   letter-spacing: 0.06em;
-  text-shadow: 0 2px 8px rgba(12, 42, 110, 0.4);
   user-select: none;
   overflow: hidden;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+  transition: transform 0.16s cubic-bezier(0.2, 1.4, 0.3, 1), box-shadow 0.16s ease,
+    filter 0.12s ease;
+}
+
+.App #buzzer > button .bird-face {
+  width: 124%;
+  height: 124%;
+  max-width: none;
+  margin: -12%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.App #buzzer > button .buzz-label {
+  position: absolute;
+  left: 50%;
+  bottom: 16%;
+  transform: translateX(-50%);
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(20, 36, 92, 0.82);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.App #buzzer > button .buzz-confirm {
+  position: absolute;
+  inset: 8%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 176, 20, 0.72);
+  color: #fffaf0;
+  font-size: 3.2rem;
+  letter-spacing: 0.12em;
+  text-shadow: 0 4px 16px rgba(90, 40, 0, 0.55);
+  animation: confirm-stamp 0.45s cubic-bezier(0.16, 1.5, 0.3, 1);
 }
 
 .App #buzzer > button::after {
@@ -383,39 +422,59 @@ body {
 
 .App #buzzer > button:hover:enabled {
   background: radial-gradient(circle at 34% 30%, #b3daff 0%, #4c9bff 46%, #2468dc 100%);
-  filter: brightness(1.05);
-  transform: translateY(-2px);
+  filter: brightness(1.12);
+  transform: translateY(-10px) scale(1.05);
 }
 
 .App #buzzer > button:active:enabled {
-  transform: scale(0.92);
-  filter: brightness(1.2);
+  transform: scale(0.72);
+  filter: brightness(2);
   box-shadow:
-    0 6px 14px rgba(18, 48, 120, 0.28),
-    inset 0 10px 18px rgba(8, 28, 80, 0.35);
+    0 0 0 10px rgba(255, 230, 120, 0.85),
+    0 8px 18px rgba(18, 48, 120, 0.28),
+    inset 0 0 40px rgba(255, 255, 255, 0.85);
 }
 
 .App #buzzer > button:active:enabled::after {
-  transform: scale(7);
-  opacity: 0;
-  transition: transform 0.28s ease, opacity 0.28s ease;
+  background: #fff4b0;
+  animation: press-flash 0.48s ease-out;
 }
 
 .App #buzzer > button:enabled {
-  animation: buzz-pulse 1.8s ease-in-out infinite;
+  animation: buzz-pulse 1.15s ease-in-out infinite;
 }
 
 .App #buzzer > button:active:enabled {
   animation: none;
 }
 
+.App #buzzer > button.buzz-confirmed {
+  animation: confirm-pop 0.55s cubic-bezier(0.16, 1.6, 0.3, 1);
+}
+
+.App #buzzer > button.buzz-confirmed::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border-radius: 50%;
+  border: 12px solid #f2c14e;
+  box-shadow: 0 0 28px rgba(255, 196, 40, 0.95);
+  animation: confirm-ring 1.2s ease-out forwards;
+  pointer-events: none;
+}
+
 .App #buzzer > button:disabled {
-  background: #3a4258;
-  border-color: rgba(255, 255, 255, 0.08);
+  background: transparent;
+  filter: grayscale(0.45) brightness(0.72);
   box-shadow: none;
-  filter: none;
   transform: none;
   animation: none;
+}
+
+.App #buzzer > button.buzz-confirmed:disabled {
+  filter: none;
+  animation: confirm-pop 0.55s cubic-bezier(0.16, 1.6, 0.3, 1);
+  box-shadow: 0 0 0 14px #f2c14e, 0 0 32px rgba(255, 196, 40, 0.95);
 }
 
 .App #buzzer > .winner-image {
@@ -434,48 +493,30 @@ body {
   }
 }
 
-.App .settings {
+.App .host-toolbar {
+  position: fixed;
+  top: 68px;
+  left: 50%;
+  z-index: 7;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 8px;
+  transform: translateX(-50%);
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.94);
+  box-shadow: 0 10px 22px rgba(70, 30, 10, 0.16);
 }
 
-.App .settings > .button-container:not(:first-child) {
-  margin-top: 0;
+.App #game .container.with-toolbar {
+  padding-top: 54px;
 }
 
-.App button.crest-unlock {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  box-shadow: none;
+.App .host-toolbar button {
+  transition: transform 0.22s ease, background-color 0.22s ease;
 }
 
-.App button.crest-unlock img {
-  width: 92px;
-  height: auto;
-  filter: drop-shadow(0 8px 12px rgba(80, 24, 24, 0.28));
-  transition: transform 0.2s ease, filter 0.2s ease;
-}
-
-.App button.crest-unlock span {
-  color: #8e1b2c;
-  font-size: 0.85rem;
-  letter-spacing: 0.16em;
-}
-
-.App button.crest-unlock:hover:enabled img {
-  transform: scale(1.06);
-}
-
-.App button.crest-unlock.is-locked img {
-  animation: crest-glow 1.4s ease-in-out infinite;
+.App .host-toolbar button:hover:enabled {
+  transform: translateY(-3px);
 }
 
 .App .settings button:hover:disabled {
@@ -539,9 +580,9 @@ body {
 }
 
 .App .queue li.resettable .player-sign:hover {
-  transform: translateY(-2px);
-  background-color: rgba(226, 195, 106, 0.35);
-  box-shadow: 0 8px 16px rgba(90, 50, 10, 0.12);
+  transform: translateY(-8px) scale(1.06);
+  background-color: rgba(226, 195, 106, 0.55);
+  box-shadow: 0 14px 24px rgba(90, 50, 10, 0.22);
 }
 
 .App .queue li .name.team-A,
@@ -619,7 +660,7 @@ body {
 
 .App #lobby,
 .App #game {
-  animation: view-in 0.45s ease;
+  animation: view-in 0.75s cubic-bezier(0.16, 1.2, 0.3, 1);
 }
 
 .celebrate {
@@ -629,28 +670,37 @@ body {
   pointer-events: none;
 }
 
-.gold-flash {
+.celebrate::before {
+  content: '';
   position: absolute;
   inset: 0;
+  background: rgba(255, 186, 40, 0.55);
+  animation: gold-flash 2.8s ease-out forwards;
+}
+
+.gold-flash {
+  position: absolute;
+  inset: -10%;
   background: radial-gradient(
-    circle at 50% 40%,
-    rgba(255, 214, 102, 0.72),
-    transparent 58%
+    circle at 50% 42%,
+    rgba(255, 244, 180, 1),
+    rgba(255, 170, 20, 0.85) 24%,
+    transparent 68%
   );
-  animation: gold-flash 0.9s ease-out forwards;
+  animation: gold-flash 2.8s ease-out forwards;
 }
 
 .spark {
   position: absolute;
   left: 50%;
-  top: 38%;
-  width: 9px;
-  height: 9px;
-  margin: -4px 0 0 -4px;
+  top: 40%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
   border-radius: 50%;
-  background: #f2c14e;
-  box-shadow: 0 0 10px #fff1c2;
-  animation: spark-fly 1.15s ease-out forwards;
+  background: #ffd24a;
+  box-shadow: 0 0 18px #fff6c2, 0 0 28px #ffb000;
+  animation: spark-fly 2.4s cubic-bezier(0.08, 0.75, 0.2, 1) forwards;
   animation-delay: var(--d);
 }
 
@@ -665,44 +715,65 @@ body {
 @keyframes crest-pop {
   0% {
     opacity: 0;
-    transform: scale(0.15);
+    transform: scale(0.05) rotate(-22deg);
   }
-  70% {
+  42% {
     opacity: 1;
-    transform: scale(1.12);
+    transform: scale(1.7) rotate(8deg);
+  }
+  64% {
+    transform: scale(0.78) rotate(-7deg);
+  }
+  80% {
+    transform: scale(1.22) rotate(3deg);
   }
   100% {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) rotate(0deg);
   }
 }
 
 @keyframes corridor-flicker {
   0%,
   100% {
-    filter: brightness(1);
+    filter: brightness(0.82);
   }
-  42% {
-    filter: brightness(1.05);
+  16% {
+    filter: brightness(1.45);
   }
-  58% {
-    filter: brightness(0.97);
+  28% {
+    filter: brightness(0.62);
+  }
+  46% {
+    filter: brightness(1.35);
+  }
+  63% {
+    filter: brightness(0.7);
+  }
+  80% {
+    filter: brightness(1.28);
   }
 }
 
 @keyframes light-flicker {
   0%,
   100% {
-    opacity: 0.28;
+    opacity: 0.15;
   }
-  35% {
-    opacity: 0.62;
+  18% {
+    opacity: 1;
   }
-  48% {
-    opacity: 0.22;
+  32% {
+    opacity: 0.05;
   }
-  72% {
-    opacity: 0.5;
+  50% {
+    opacity: 0.92;
+  }
+  68% {
+    opacity: 0.08;
+  }
+  84% {
+    opacity: 0.8;
   }
 }
 
@@ -712,24 +783,14 @@ body {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.035);
-  }
-}
-
-@keyframes crest-glow {
-  0%,
-  100% {
-    filter: drop-shadow(0 8px 12px rgba(80, 24, 24, 0.28));
-  }
-  50% {
-    filter: drop-shadow(0 0 14px rgba(226, 195, 106, 0.95));
+    transform: scale(1.1);
   }
 }
 
 @keyframes view-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(56px) scale(0.9);
   }
   to {
     opacity: 1;
@@ -740,7 +801,10 @@ body {
 @keyframes winner-in {
   from {
     opacity: 0;
-    transform: scale(0.94);
+    transform: scale(0.55);
+  }
+  70% {
+    transform: scale(1.06);
   }
   to {
     opacity: 1;
@@ -752,7 +816,13 @@ body {
   0% {
     opacity: 0;
   }
-  25% {
+  12% {
+    opacity: 1;
+  }
+  38% {
+    opacity: 0.75;
+  }
+  55% {
     opacity: 1;
   }
   100% {
@@ -763,11 +833,56 @@ body {
 @keyframes spark-fly {
   0% {
     opacity: 1;
-    transform: rotate(var(--a)) translateY(0) scale(1);
+    transform: rotate(var(--a)) translateY(0) scale(1.2);
   }
   100% {
     opacity: 0;
-    transform: rotate(var(--a)) translateY(-220px) scale(0.35);
+    transform: rotate(var(--a)) translateY(calc(var(--dist) * -1)) scale(0.15);
+  }
+}
+
+@keyframes press-flash {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(16);
+    opacity: 0;
+  }
+}
+
+@keyframes confirm-pop {
+  0% {
+    transform: scale(0.72);
+  }
+  55% {
+    transform: scale(1.16);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes confirm-stamp {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes confirm-ring {
+  0% {
+    transform: scale(0.7);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
   }
 }
 
@@ -785,7 +900,7 @@ body {
   .App #game,
   .App #buzzer > button,
   .App #buzzer > .winner-image,
-  .App button.crest-unlock.is-locked img,
+  .celebrate::before,
   .gold-flash,
   .spark {
     animation: none;

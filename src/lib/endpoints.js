@@ -4,6 +4,9 @@ import { Buzzer } from '../lib/store';
 axios.defaults.headers['Content-Type'] = 'application/json';
 axios.defaults.headers['Accept'] = 'application/json';
 
+const OFFICIAL_SERVER = 'https://www.multibuzz.app';
+const configuredServer = process.env.REACT_APP_GAME_SERVER;
+
 const hostname = window.location.hostname;
 const port = window.location.port;
 const protocol = window.location.protocol;
@@ -11,9 +14,17 @@ const gameport = process.env.PORT || 4001;
 const url = protocol + '//' + hostname + (port ? ':' + port : '');
 const localUrl = `${protocol}//${hostname}:${gameport}`;
 
-const LOBBY_SERVER = process.env.NODE_ENV === 'production' ? url : localUrl;
+const hostedOnGitHubPages = hostname.endsWith('.github.io');
+const productionServer = configuredServer
+  ? configuredServer.replace(/\/$/, '')
+  : hostedOnGitHubPages
+  ? OFFICIAL_SERVER
+  : url;
+
+const LOBBY_SERVER =
+  process.env.NODE_ENV === 'production' ? productionServer : localUrl;
 export const GAME_SERVER =
-  process.env.NODE_ENV === 'production' ? url : localUrl;
+  process.env.NODE_ENV === 'production' ? productionServer : localUrl;
 
 export async function getRoom(roomId) {
   // convert to uppercase

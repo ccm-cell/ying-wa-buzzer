@@ -4,6 +4,7 @@ import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
 import { Container } from 'react-bootstrap';
 import Header from '../components/Header';
+import { teamImageForName } from '../lib/teams';
 
 export default function Table(game) {
   const [loaded, setLoaded] = useState(false);
@@ -76,7 +77,7 @@ export default function Table(game) {
   // spacebar will buzz
   useEffect(() => {
     function onKeydown(e) {
-      if (e.keyCode === 32 && !e.repeat) {
+      if (e.keyCode === 32 && !e.repeat && buzzButton.current) {
         buzzButton.current.click();
         e.preventDefault();
       }
@@ -126,6 +127,9 @@ export default function Table(game) {
     return `+${delta} ms`;
   };
 
+  const winner = buzzedPlayers[0];
+  const winnerImage = isHost && winner ? teamImageForName(winner.name) : null;
+
   return (
     <div>
       <Header
@@ -147,17 +151,25 @@ export default function Table(game) {
             <p className="warning">Disconnected - attempting to reconnect...</p>
           ) : null}
           <div id="buzzer">
-            <button
-              ref={buzzButton}
-              disabled={buzzed || game.G.locked}
-              onClick={() => {
-                if (!buzzed && !game.G.locked) {
-                  attemptBuzz();
-                }
-              }}
-            >
-              {game.G.locked ? 'Locked' : buzzed ? 'Buzzed' : 'Buzz'}
-            </button>
+            {winnerImage ? (
+              <img
+                className="winner-image"
+                src={winnerImage}
+                alt={`${winner.name} 搶答成功`}
+              />
+            ) : (
+              <button
+                ref={buzzButton}
+                disabled={buzzed || game.G.locked}
+                onClick={() => {
+                  if (!buzzed && !game.G.locked) {
+                    attemptBuzz();
+                  }
+                }}
+              >
+                {game.G.locked ? 'Locked' : buzzed ? 'Buzzed' : 'Buzz'}
+              </button>
+            )}
           </div>
           {isHost ? (
             <div className="settings">

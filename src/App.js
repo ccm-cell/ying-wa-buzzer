@@ -18,9 +18,11 @@ function App() {
     roomID: null,
   });
 
+  const routerBasename = process.env.PUBLIC_URL || '';
+
   return (
     <div className="App">
-      <Router>
+      <Router basename={routerBasename}>
         <Switch>
           <Route
             path="/:id"

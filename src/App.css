@@ -298,6 +298,14 @@ body {
   background-color: var(--lightBackgroundColor);
 }
 
+.App #buzzer > .winner-image {
+  width: min(960px, 94vw);
+  max-height: 68vh;
+  object-fit: contain;
+  border-radius: 16px;
+  background: #111;
+}
+
 @media screen and (max-width: 767px) {
   .App #buzzer > button {
     max-width: 200px;

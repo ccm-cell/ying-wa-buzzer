@@ -5,6 +5,8 @@ import { AiOutlineDisconnect } from 'react-icons/ai';
 import { Container } from 'react-bootstrap';
 import Header from '../components/Header';
 import { CreatorCredit } from './Footer';
+import ChoiceBoard from './ChoiceBoard';
+import { useChoiceRoom } from './useChoiceRoom';
 import birdButton from '../assets/bird-buzzer-button.jpg';
 import { teamFromName, teamImageForName } from '../lib/teams';
 
@@ -32,6 +34,11 @@ export default function Table(game) {
   const winnerSeen = useRef(false);
   const lastWinner = useRef(null);
   const wasBuzzed = useRef(buzzed);
+  const choice = useChoiceRoom({
+    gameID: game.gameID,
+    playerID: game.playerID,
+    credentials: game.headerData && game.headerData.credentials,
+  });
 
   const buzzSound = new Howl({
     src: [
@@ -173,6 +180,11 @@ export default function Table(game) {
       '0'
     ) || null;
   const isHost = get(firstPlayer, 'id') === game.playerID;
+  const myName = get(
+    players.find((player) => player.id === String(game.playerID)),
+    'name'
+  );
+  const choiceMode = choice.mode === 'choice';
 
   const queue = sortBy(values(game.G.queue), ['timestamp']);
   const buzzedPlayers = queue
@@ -239,16 +251,34 @@ export default function Table(game) {
       />
       {isHost ? (
         <div className="host-toolbar">
-          <button type="button" onClick={onCrest}>
-            {game.G.locked || sealed ? '解開' : '鎖上'}
+          <button
+            type="button"
+            className={!choiceMode ? 'is-on' : ''}
+            onClick={() => choice.setMode('buzz')}
+          >
+            搶答
           </button>
           <button
             type="button"
-            disabled={isEmpty(game.G.queue)}
-            onClick={resetAll}
+            className={choiceMode ? 'is-on' : ''}
+            onClick={() => choice.setMode('choice')}
           >
-            Reset all buzzers
+            選擇題
           </button>
+          {choiceMode ? null : (
+            <button type="button" onClick={onCrest}>
+              {game.G.locked || sealed ? '解開' : '鎖上'}
+            </button>
+          )}
+          {choiceMode ? null : (
+            <button
+              type="button"
+              disabled={isEmpty(game.G.queue)}
+              onClick={resetAll}
+            >
+              Reset all buzzers
+            </button>
+          )}
         </div>
       ) : null}
       <Container className={isHost ? 'with-toolbar' : ''}>
@@ -257,53 +287,97 @@ export default function Table(game) {
           {!game.isConnected ? (
             <p className="warning">Disconnected - attempting to reconnect...</p>
           ) : null}
-          <div id="buzzer">
-            {winnerImage ? (
-              <img
-                className="winner-image"
-                src={winnerImage}
-                alt={`${winner.name} 搶答成功`}
-              />
-            ) : (
-              <button
-                ref={buzzButton}
-                className={confirmed ? 'buzz-confirmed' : ''}
-                disabled={held}
-                onClick={() => {
-                  if (!held) {
-                    attemptBuzz();
-                  }
-                }}
-              >
-                <img className="bird-face" src={birdButton} alt="" />
-                <span className="buzz-label">
-                  {game.G.locked || sealed
-                    ? 'Locked'
-                    : buzzed
-                    ? 'Buzzed'
-                    : 'Buzz'}
-                </span>
-                {confirmed ? (
-                  <span className="buzz-confirm">求之不得</span>
-                ) : null}
-              </button>
-            )}
-          </div>
+          {isHost && choice.status === 'unavailable' ? (
+            <p className="warning">選擇題同步未連上。搶答仍然可用。</p>
+          ) : null}
+          {choiceMode ? (
+            <ChoiceBoard
+              isHost={isHost}
+              players={players}
+              playerID={game.playerID}
+              myName={myName}
+              seconds={choice.seconds}
+              round={choice.round}
+              deadline={choice.deadline}
+              answers={choice.answers}
+              estimateServerNow={choice.estimateServerNow}
+              setSeconds={choice.setSeconds}
+              unlock={choice.unlock}
+              choose={choice.choose}
+            />
+          ) : (
+            <div id="buzzer">
+              {winnerImage ? (
+                <img
+                  className="winner-image"
+                  src={winnerImage}
+                  alt={`${winner.name} 搶答成功`}
+                />
+              ) : (
+                <button
+                  ref={buzzButton}
+                  className={confirmed ? 'buzz-confirmed' : ''}
+                  disabled={held}
+                  onClick={() => {
+                    if (!held) {
+                      attemptBuzz();
+                    }
+                  }}
+                >
+                  <img className="bird-face" src={birdButton} alt="" />
+                  <span className="buzz-label">
+                    {game.G.locked || sealed
+                      ? 'Locked'
+                      : buzzed
+                      ? 'Buzzed'
+                      : 'Buzz'}
+                  </span>
+                  {confirmed ? (
+                    <span className="buzz-confirm">求之不得</span>
+                  ) : null}
+                </button>
+              )}
+            </div>
+          )}
         </section>
-        <div className="player-board">
-          <div className="queue">
-            <p>Players Buzzed</p>
-            <ul>
-              {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
-                <li key={id} className={isHost ? 'resettable' : null}>
-                  <div
-                    className="player-sign"
-                    onClick={() => {
-                      if (isHost) {
-                        game.moves.resetBuzzer(id);
-                      }
-                    }}
-                  >
+        {choiceMode ? null : (
+          <div className="player-board">
+            <div className="queue">
+              <p>Players Buzzed</p>
+              <ul>
+                {buzzedPlayers.map(({ id, name, timestamp, connected }, i) => (
+                  <li key={id} className={isHost ? 'resettable' : null}>
+                    <div
+                      className="player-sign"
+                      onClick={() => {
+                        if (isHost) {
+                          game.moves.resetBuzzer(id);
+                        }
+                      }}
+                    >
+                      <div className={nameClass(name, connected)}>
+                        {name}
+                        {!connected ? (
+                          <AiOutlineDisconnect className="disconnected" />
+                        ) : (
+                          ''
+                        )}
+                      </div>
+                      {i > 0 ? (
+                        <div className="mini">
+                          {timeDisplay(timestamp - queue[0].timestamp)}
+                        </div>
+                      ) : null}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="queue">
+              <p>Other Players</p>
+              <ul>
+                {activePlayers.map(({ id, name, connected }) => (
+                  <li key={id}>
                     <div className={nameClass(name, connected)}>
                       {name}
                       {!connected ? (
@@ -312,34 +386,12 @@ export default function Table(game) {
                         ''
                       )}
                     </div>
-                    {i > 0 ? (
-                      <div className="mini">
-                        {timeDisplay(timestamp - queue[0].timestamp)}
-                      </div>
-                    ) : null}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div className="queue">
-            <p>Other Players</p>
-            <ul>
-              {activePlayers.map(({ id, name, connected }) => (
-                <li key={id}>
-                  <div className={nameClass(name, connected)}>
-                    {name}
-                    {!connected ? (
-                      <AiOutlineDisconnect className="disconnected" />
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        )}
       </Container>
       <CreatorCredit />
     </div>
